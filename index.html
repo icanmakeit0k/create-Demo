@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capsules - A Moyra Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/preline@2.1.0/dist/preline.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --dark-bg: #1e1e1e;
+        --light-bg: #f0ebe5;
+      }
+      html.lenis {
+        height: auto;
+      }
+      .lenis.lenis-smooth {
+        scroll-behavior: auto !important;
+      }
+      .lenis.lenis-stopped {
+        overflow: hidden;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--dark-bg);
+        color: #fff;
+        overflow-x: hidden;
+        cursor: none;
+      }
+      #preloader {
+        position: fixed;
+        inset: 0;
+        background-color: var(--dark-bg);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #capsule-loader {
+        position: relative;
+        width: 350px;
+        height: 150px;
+        border-radius: 9999px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--dark-bg);
+      }
+      #loader-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background-color: var(--light-bg);
+        z-index: 1;
+      }
+      #capsule-loader-text {
+        position: relative;
+        font-size: 2rem;
+        font-weight: 600;
+        color: white;
+        mix-blend-mode: difference;
+        filter: invert(1);
+        z-index: 3;
+      }
+      #custom-cursor {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background-color: #fff;
+        border-radius: 50%;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        mix-blend-mode: difference;
+        transition: width 0.3s, height 0.3s, background-color 0.3s,
+          transform 0.1s linear;
+        z-index: 9999;
+      }
+      #custom-cursor.hover {
+        width: 40px;
+        height: 40px;
+      }
+      #fullscreen-menu {
+        background-color: var(--light-bg);
+        color: var(--dark-bg);
+        transition: clip-path 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+        clip-path: circle(0% at center bottom);
+      }
+      #fullscreen-menu.open {
+        clip-path: circle(150% at center bottom);
+      }
+
+      #hero-animation-wrapper {
+        will-change: transform, border-radius;
+      }
+      #hero-animation-wrapper > img {
+        will-change: transform;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <div id="preloader">
+      <div id="capsule-loader">
+        <div id="loader-fill"></div>
+        <div id="capsule-loader-text">Capsules®</div>
+      </div>
+    </div>
+
+    <div id="custom-cursor"></div>
+
+    <!-- Fullscreen Menu -->
+    <div id="fullscreen-menu" class="fixed inset-0 z-[60]">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-between py-12"
+      >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-16">
+          <div class="text-5xl md:text-6xl font-medium flex flex-col space-y-4">
+            <a
+              href="#intro-text-section"
+              class="menu-link hover:opacity-70 transition-opacity"
+              >Welcome</a
+            >
+            <a
+              href="#horizontal-scroll"
+              class="menu-link hover:opacity-70 transition-opacity"
+              >Houses</a
+            >
+            <a
+              href="#activities"
+              class="menu-link hover:opacity-70 transition-opacity"
+              >Activities</a
+            >
+          </div>
+        </div>
+        <button
+          id="close-menu-btn"
+          type="button"
+          class="self-center flex items-center gap-x-2 p-3 rounded-full border border-gray-800 bg-transparent text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-800/10"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <div id="page-wrapper" class="opacity-0 bg-[var(--dark-bg)]">
+      <header
+        class="py-4 px-4 sm:px-6 lg:px-8 fixed top-0 left-0 w-full z-50 text-white"
+        id="main-header"
+      >
+        <nav
+          class="flex justify-between items-center w-full"
+          aria-label="Global"
+        >
+          <a
+            class="flex-none text-2xl font-semibold"
+            href="#"
+            aria-label="Capsules"
+            >Capsules®</a
+          >
+          <button
+            type="button"
+            class="hidden md:flex items-center gap-x-2 text-white font-medium rounded-full bg-white/10 px-4 py-2 backdrop-blur-sm"
+          >
+            <span>Reserve</span>
+          </button>
+        </nav>
+      </header>
+
+      <div
+        class="fixed bottom-0 left-0 w-full z-50 p-6 flex justify-center"
+        id="main-menu-btn-wrapper"
+      >
+        <button
+          id="open-menu-btn"
+          type="button"
+          class="inline-flex items-center gap-x-2 rounded-full border border-gray-200/50 bg-black/30 backdrop-blur-md px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-black/50 transition-colors"
+        >
+          <span>Menu</span>
+        </button>
+      </div>
+
+      <main id="content">
+        <!-- Hero Scroll Container -->
+        <div id="hero-scroll-container" class="h-[150vh]">
+          <div id="hero-pin" class="h-screen w-full sticky top-0">
+            <div
+              id="hero-animation-wrapper"
+              class="relative h-full w-full overflow-hidden"
+            >
+              <img
+                src="./italy-7708551_1280.jpg"
+                alt="Hero background of a desert capsule home"
+                class="absolute inset-0 w-full h-full object-cover scale-[1.05]"
+              />
+              <div
+                class="relative z-10 flex flex-col h-full text-left p-4 sm:p-6 lg:p-8"
+                id="hero-content"
+              >
+                <div class="mt-auto max-w-7xl mx-auto w-full">
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 items-end">
+                    <div class="col-span-1">
+                      <h1
+                        class="text-4xl md:text-5xl font-medium text-white tracking-tight"
+                      >
+                        Closer to<br />Nature—Closer<br />to Yourself
+                      </h1>
+                    </div>
+                    <div class="col-span-1 md:col-start-3 text-right">
+                      <p class="max-w-xs text-base text-white/80 ml-auto">
+                        Spend unforgettable and remarkable time in the
+                        Californian desert with—Capsules.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[var(--dark-bg)] relative z-10">
+          <div id="intro-text-section" class="py-24 sm:py-48">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+              <p
+                class="intro-text text-3xl md:text-5xl leading-tight tracking-tight"
+              >
+                Welcome to a world of wild California desert with Capsules®,
+                where you will discover exquisite nature observing it from
+                capsule houses.
+              </p>
+            </div>
+          </div>
+
+          <div class="sticky-horizontal-container">
+            <div
+              id="horizontal-scroll"
+              class="sticky top-0 overflow-hidden w-full h-screen flex items-center cursor-grab"
+            >
+              <div
+                id="horizontal-content"
+                class="flex items-center gap-x-12 px-12"
+              >
+                <div
+                  class="w-[80vw] md:w-[40vw] flex-shrink-0 text-left capsule-card"
+                >
+                  <h2
+                    class="card-heading text-4xl md:text-6xl font-bold tracking-tighter"
+                  >
+                    Discover available Capsules®
+                  </h2>
+                  <p class="card-text mt-4 text-white/70 text-lg">
+                    You can choose one of three premium capsule houses in our
+                    offer.
+                  </p>
+                </div>
+                <div
+                  class="capsule-card w-[90vw] md:w-[70vw] lg:w-[60vw] flex-shrink-0 relative h-3/4 rounded-3xl overflow-hidden"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop"
+                    alt="Classic Capsule"
+                    class="card-image w-full h-full object-cover"
+                  />
+                </div>
+                <div
+                  class="capsule-card w-[90vw] md:w-[70vw] lg:w-[60vw] flex-shrink-0 relative h-3/4 rounded-3xl overflow-hidden"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2070&auto=format&fit=crop"
+                    alt="Terrace Capsule"
+                    class="card-image w-full h-full object-cover"
+                  />
+                </div>
+                <div
+                  class="capsule-card w-[90vw] md:w-[70vw] lg:w-[60vw] flex-shrink-0 relative h-3/4 rounded-3xl overflow-hidden"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1594563703937-fdc640497dcd?q=80&w=1974&auto=format&fit=crop"
+                    alt="Desert Capsule"
+                    class="card-image w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/preline@2.1.0/dist/preline.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        try {
+          const lenis = new Lenis();
+          lenis.on("scroll", ScrollTrigger.update);
+          gsap.ticker.add((time) => lenis.raf(time * 1000));
+          gsap.ticker.lagSmoothing(0);
+
+          // --- Function to set up all scroll-triggered animations ---
+          function setupScrollTriggers() {
+            // Hero-to-card animation
+            gsap.to("#hero-animation-wrapper", {
+              scrollTrigger: {
+                trigger: "#hero-scroll-container",
+                start: "top top",
+                end: "bottom top",
+                scrub: 0.5,
+              },
+              scale: 0.9,
+              borderRadius: "2.5rem",
+              ease: "power1.out",
+            });
+
+            // Horizontal scroll
+            const horizontalContent =
+              document.getElementById("horizontal-content");
+            if (horizontalContent) {
+              let cards = gsap.utils.toArray(
+                "#horizontal-content .capsule-card"
+              );
+              gsap.to(cards, {
+                xPercent: -100 * (cards.length - 1),
+                ease: "none",
+                scrollTrigger: {
+                  trigger: ".sticky-horizontal-container",
+                  pin: true,
+                  scrub: 1,
+                  snap: 1 / (cards.length - 1),
+                  end: () =>
+                    "+=" + (horizontalContent.scrollWidth - window.innerWidth),
+                },
+              });
+            }
+          }
+
+          const startIntro = () => {
+            const masterTl = gsap.timeline({
+              onStart: () => lenis.stop(),
+              onComplete: () => {
+                document.getElementById("preloader").style.display = "none";
+                // Initialize scroll animations AFTER the intro is done
+                setupScrollTriggers();
+                ScrollTrigger.refresh();
+                lenis.start();
+              },
+            });
+
+            masterTl
+              .to("#loader-fill", {
+                width: "100%",
+                duration: 2,
+                ease: "power2.inOut",
+              })
+              .to(
+                "#preloader",
+                { opacity: 0, duration: 1.5, ease: "power2.out" },
+                "+=0.5"
+              )
+              .to("#page-wrapper", { opacity: 1, duration: 0.1 }, "<")
+              .from(
+                ["#main-header", "#main-menu-btn-wrapper", "#hero-content > *"],
+                {
+                  opacity: 0,
+                  y: 20,
+                  stagger: 0.2,
+                  duration: 1.5,
+                  ease: "power3.out",
+                },
+                "-=1.0"
+              );
+          };
+
+          window.addEventListener("load", startIntro);
+
+          const toggleMenu = (open) => {
+            document
+              .getElementById("fullscreen-menu")
+              .classList.toggle("open", open);
+            lenis.isStopped = open;
+          };
+
+          document
+            .getElementById("open-menu-btn")
+            .addEventListener("click", () => toggleMenu(true));
+          document
+            .getElementById("close-menu-btn")
+            .addEventListener("click", () => toggleMenu(false));
+          document.querySelectorAll(".menu-link").forEach((link) => {
+            link.addEventListener("click", (e) => {
+              e.preventDefault();
+              toggleMenu(false);
+              setTimeout(() => lenis.scrollTo(link.getAttribute("href")), 100);
+            });
+          });
+
+          setTimeout(() => HSStaticMethods.autoInit(), 100);
+
+          const cursor = document.getElementById("custom-cursor");
+          if (cursor) {
+            window.addEventListener("mousemove", (e) => {
+              gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 });
+            });
+            document.querySelectorAll("a, button").forEach((el) => {
+              el.addEventListener("mouseenter", () =>
+                gsap.to(cursor, { scale: 4, duration: 0.3 })
+              );
+              el.addEventListener("mouseleave", () =>
+                gsap.to(cursor, { scale: 1, duration: 0.3 })
+              );
+            });
+          }
+        } catch (e) {
+          console.error("Error during page initialization:", e);
+          document.getElementById("preloader").style.display = "none";
+          document.getElementById("page-wrapper").style.opacity = "1";
+        }
+      });
+    </script>
+  </body>
+</html>
